@@ -3,6 +3,7 @@ import glob
 import pandas as pd
 import os
 from dotenv import load_dotenv
+from utils.send_minio import send_to_minio
 
 load_dotenv() 
 
@@ -40,6 +41,7 @@ def main():
     spark_df = convert_to_spark_df(merged_df,spark)
     to_csv(spark_df, "./merged.csv")
     print('writed')
+    send_to_minio('./merged.csv', 'merged.csv')
 
     
 if __name__ == "__main__":
