@@ -22,8 +22,6 @@ def get_of_minio():
 
         os.makedirs(os.path.dirname(local_path), exist_ok=True)
 
-        print(f"Baixando {object_name} para {local_path}...")
+        print(f"downloading {object_name} to {local_path}...")
         client.fget_object(bucket_name, object_name, local_path)
-        
-get_of_minio()
-    
+            

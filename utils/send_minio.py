@@ -3,7 +3,7 @@ from minio import Minio
 from dotenv import load_dotenv
 import glob
 
-load_dotenv() 
+load_dotenv()
 
 client = Minio(os.getenv("MINIO_URL"),
     access_key=os.getenv("MINIO_ACCESS_KEY"),

@@ -4,6 +4,7 @@ import pandas as pd
 import os
 from dotenv import load_dotenv
 from utils.send_minio import send_to_minio
+import uuid
 
 load_dotenv() 
 
@@ -13,6 +14,7 @@ def append_dataframes():
     excels = glob.glob(EXCEL_FILE_PATH)
     result = []
     for file in excels:
+        
         df = pd.read_excel(file)
         df['filename'] = file
         result.append(df)
@@ -30,18 +32,18 @@ def convert_to_spark_df(pandas_df,spark):
             merged_df = merged_df.union(spark_dfs[i])
     return merged_df
 
-def to_csv(spark_df, output_path):
-    if spark_df:
-        spark_df.coalesce(1).write.option("header", "true").csv(output_path)
+def write_to_csv(spark_df, output_path):
+    spark_df.repartition(1).write.option("header", "true").mode("overwrite").csv(output_path)
         
 
 def main():
     spark = SparkSession.builder.appName("MergeExcelFiles").getOrCreate()
     merged_df = append_dataframes()
     spark_df = convert_to_spark_df(merged_df,spark)
-    to_csv(spark_df, "./merged.csv")
+    generated_uuid = str(uuid.uuid4())
+    write_to_csv(spark_df, "./merged-"+generated_uuid)
     print('writed')
-    send_to_minio('./merged.csv', 'merged.csv')
+    send_to_minio('./merged-'+generated_uuid, 'merged-'+generated_uuid)
 
     
 if __name__ == "__main__":
